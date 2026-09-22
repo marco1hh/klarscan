@@ -1,0 +1,13 @@
+{
+  "name": "Klarscan",
+  "short_name": "Klarscan",
+  "description": "Dokumente scannen und als PDF speichern – on-device.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FBF7F0",
+  "theme_color": "#0F3D2E",
+  "lang": "de",
+  "icons": [
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
