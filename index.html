@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0F3D2E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Klarscan">
+  <meta name="description" content="Belege und Dokumente scannen. PDF entsteht auf dem Gerät. Nichts geht in die Cloud.">
+  <title>Klarscan</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="icon" href="./icons/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><span class="logo">K</span> Klarscan</div>
+      <span class="chip" id="quota">5 von 5 PDFs frei</span>
+    </header>
+
+    <section class="screen" data-screen="onboarding">
+      <div class="hero">
+        <p class="chip" style="background:#1f5b45;color:#d7f0e3;display:inline-block;margin-bottom:14px">Testversion 0.9</p>
+        <h1>Scannen. PDF. Fertig. Nichts verlässt das Handy.</h1>
+        <p>Klarscan macht aus Fotos lesbare Dokumente. Kein Konto. Keine Cloud. Kein Tracking.</p>
+        <button class="btn btn-primary" id="start-app">Loslegen</button>
+      </div>
+      <div class="list">
+        <div class="card"><strong>1. Foto machen</strong><p class="muted">Kamera oder Galerie. Mehrere Seiten nacheinander.</p></div>
+        <div class="card"><strong>2. Filter wählen</strong><p class="muted">Dokument macht Belege kontrastreicher. Original bleibt foto-treu.</p></div>
+        <div class="card"><strong>3. PDF teilen</strong><p class="muted">Direkt in Files, Mail oder WhatsApp. Datei entsteht lokal.</p></div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="home">
+      <div class="hero">
+        <h1>Was soll raus?</h1>
+        <p>Beleg, Vertrag, Ausweis-Kopie, Packzettel. QR geht extra.</p>
+        <div class="grid-actions">
+          <button class="card-btn" id="btn-scan"><div class="ico">📷</div><strong>Kamera</strong><span>Foto aufnehmen</span></button>
+          <button class="card-btn" id="btn-gallery"><div class="ico">🖼</div><strong>Galerie</strong><span>Bild wählen</span></button>
+          <button class="card-btn" id="btn-qr"><div class="ico">▢</div><strong>QR / Barcode</strong><span>Code lesen</span></button>
+          <button class="card-btn" id="go-settings"><div class="ico">⚙️</div><strong>Einstellungen</strong><span>Tester, Limit, Rechtliches</span></button>
+        </div>
+      </div>
+      <h2>Auf diesem Gerät</h2>
+      <div id="doc-list" class="list"></div>
+      <p class="counter">Testhinweis: Zum Homescreen hinzufügen fühlt sich an wie eine App. iPhone: Teilen → Zum Home-Bildschirm.</p>
+    </section>
+
+    <section class="screen" data-screen="editor">
+      <button class="btn-ghost" id="go-home">← Zurück</button>
+      <h1>Dokument</h1>
+      <input id="doc-title" type="text" placeholder="Titel, z. B. Rewe Beleg 22.09.">
+      <p class="muted" id="page-info">Seite 1 / 1</p>
+      <div class="editor-stage" id="stage"></div>
+      <div class="pages" id="pages"></div>
+      <div class="tools">
+        <button class="tool" data-filter="document">Dokument</button>
+        <button class="tool" data-filter="enhance">Kräftig</button>
+        <button class="tool" data-filter="original">Original</button>
+        <button class="tool" id="rotate">Drehen</button>
+        <button class="tool" id="trim">Ränder</button>
+        <button class="tool" id="add-page">+ Seite</button>
+        <button class="tool" id="delete-page">Seite weg</button>
+      </div>
+      <div class="row">
+        <button class="btn btn-secondary" id="new-doc">Neu</button>
+        <button class="btn btn-primary" id="pdf-btn">PDF erzeugen</button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="qr">
+      <button class="btn-ghost" id="go-home-2">← Zurück</button>
+      <h1>Code scannen</h1>
+      <p class="lead">QR und gängige Barcodes. Kamera bleibt lokal.</p>
+      <div class="qr-box"><video id="qr-video" playsinline muted></video></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn btn-secondary" id="qr-photo">Bild prüfen</button>
+      </div>
+      <div id="qr-result" class="qr-result hidden">
+        <strong>Ergebnis</strong>
+        <p id="qr-text"></p>
+        <div class="row">
+          <button class="btn btn-secondary" id="copy-qr">Kopieren</button>
+          <a class="btn btn-primary" id="qr-open" target="_blank" rel="noopener">Öffnen</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="settings">
+      <button class="btn-ghost" id="go-home-3">← Zurück</button>
+      <h1>Einstellungen</h1>
+      <div class="settings-item"><span>Tester-Modus</span><strong id="tester-flag">aus</strong></div>
+      <p class="muted">Tester-Code eingeben, dann ist das 5-PDF-Limit aus.</p>
+      <input id="tester-code" type="text" placeholder="Code" autocomplete="off">
+      <div class="row" style="margin-top:10px">
+        <button class="btn btn-primary" id="unlock">Freischalten</button>
+        <button class="btn btn-secondary" id="reset-quota">Zähler 0</button>
+      </div>
+      <p class="muted" id="install-hint" style="margin-top:18px">PWA: Im Browser Menü → Zum Home-Bildschirm.</p>
+      <div class="row" style="margin-top:18px">
+        <button class="btn btn-secondary" id="go-feedback">Feedback</button>
+        <button class="btn btn-secondary" id="go-legal">Impressum</button>
+      </div>
+      <p class="muted" style="margin-top:16px"><button class="btn-ghost" id="go-onboarding">Intro nochmal</button></p>
+    </section>
+
+    <section class="screen" data-screen="paywall">
+      <div class="paywall">
+        <h1>5 PDFs sind raus.</h1>
+        <p>So fühlt sich das spätere Modell an. In der Testversion schaltest du mit Code frei.</p>
+        <p class="price">19,99 € / Jahr</p>
+        <p>oder 39,99 € einmal Lifetime – geplant, noch nicht kaufbar.</p>
+        <button class="btn btn-secondary" onclick="document.getElementById('go-settings').click()">Zu den Einstellungen</button>
+      </div>
+      <p class="lead" style="margin-top:16px">Kein Abo wird abgebucht. Das ist nur der Test der Grenze.</p>
+    </section>
+
+    <section class="screen legal" data-screen="legal">
+      <button class="btn-ghost" onclick="document.getElementById('go-settings').click()">← Zurück</button>
+      <h1>Impressum & Datenschutz</h1>
+      <p><strong>Anbieter Testversion</strong><br>
+        Marco Melzer<br>
+        Max Zelck Straße 27<br>
+        22459 Hamburg</p>
+      <p>Klarscan ist eine Test-App. Kein App-Store-Listing, keine Zahlungen, kein Tracking.</p>
+      <h2>Daten</h2>
+      <ul>
+        <li>Fotos und PDFs bleiben im Browser dieses Geräts (IndexedDB / Download).</li>
+        <li>Kein Server, kein Konto, keine Analyse-Cookies.</li>
+        <li>Schriftarten können von Google Fonts geladen werden, solange Netz da ist.</li>
+        <li>PDF-Bibliothek kommt von einem CDN (cdn.jsdelivr.net), nur der Programmcode.</li>
+      </ul>
+      <p>Du kannst Dokumente in der Liste löschen oder die Browserdaten für diese Seite leeren.</p>
+    </section>
+
+    <section class="screen" data-screen="feedback">
+      <button class="btn-ghost" onclick="document.getElementById('go-settings').click()">← Zurück</button>
+      <h1>Was hakte?</h1>
+      <p class="lead">Ehrlich. Zu dunkel, PDF zu groß, Filter schlecht, Button doof – alles hilft.</p>
+      <textarea id="feedback-text" placeholder="Gerät, was du getan hast, was schiefging."></textarea>
+      <p class="muted">Optional: Mail, falls du das Feedback per Mail-Entwurf schicken willst.</p>
+      <input id="feedback-mail" type="email" placeholder="deine Mail (optional)">
+      <button class="btn btn-primary" id="send-feedback" style="margin-top:12px">Feedback kopieren</button>
+    </section>
+  </div>
+
+  <input id="file-camera" class="hidden" type="file" accept="image/*" capture="environment">
+  <input id="file-gallery" class="hidden" type="file" accept="image/*" multiple>
+  <input id="file-more" class="hidden" type="file" accept="image/*" multiple>
+  <input id="file-qr" class="hidden" type="file" accept="image/*" capture="environment">
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
